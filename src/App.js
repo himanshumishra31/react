@@ -6,7 +6,7 @@ const postList = [[0, 'sport', 'himanshu'], [1, 'fashion', 'deepika'], [2, 'poli
 class List extends React.Component {
   render() {
     function editPost(key, post, handleSubmit, handleInputChange) {
-      if (key.length != 0 && key.includes(post[0].toString()) ) {
+      if (key.length != 0 && key == post[0] ) {
         return <PostForm editPost="true" authorName={post[2]} postName={post[1]} onSubmit={handleSubmit} onChange={handleInputChange} />;
       }
     }
@@ -46,7 +46,7 @@ class PostForm extends React.Component {
 class InitialLayout extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { newForm: false, postArray: postList, authorName: '', postName: '', editPost: false, editPostkey: [] }
+    this.state = { newForm: false, postArray: postList, authorName: '', postName: '', editPost: false, editPostkey: '' }
     this.handleClick = this.handleClick.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -70,18 +70,15 @@ class InitialLayout extends React.Component {
   handleSubmit(event) {
     let posts = this.state.postArray;
     if(this.state.editPost) {
-      let postKey = event.target.parentElement.id
-      let postIndex = this.findKeyIndex(postKey);
+      let postIndex = this.findKeyIndex(this.state.editPostkey)
       posts[postIndex][1] = this.state.postName;
       posts[postIndex][2] = this.state.authorName;
-      let editPostKeyArray = this.state.editPostkey;
-      editPostKeyArray.splice( editPostKeyArray.indexOf(postKey), 1 )
-      this.setState({editPost: false, editPostkey: editPostKeyArray})
+      this.setState({editPost: true, editPostkey: ''})
     } else {
       posts.push([this.count, this.state.postName, this.state.authorName])
       this.count += 1;
     }
-    this.setState({ postArray: posts});
+    this.setState({ postArray: posts });
     event.preventDefault();
   }
 
@@ -94,9 +91,7 @@ class InitialLayout extends React.Component {
   }
 
   handleEditClick(event) {
-    let editPostkeys = this.state.editPostkey;
-    editPostkeys.push(event.target.parentElement.id);
-    this.setState({editPost: true, editPostkey: editPostkeys})
+    this.setState({editPost: true, editPostkey: event.target.parentElement.id})
   }
 
   onDelete(event) {
