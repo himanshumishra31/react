@@ -7,10 +7,9 @@ class List extends React.Component {
   constructor(props) {
     super(props);
     this.state = { edit: false };
-    this.handleEditClick = this.handleEditClick.bind(this); // check how to remove bind
   }
 
-  handleEditClick() {
+  handleEditClick = () => {
     this.setState({ edit: !this.state.edit })
   }
 
@@ -44,11 +43,9 @@ class PostForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = { key: this.props.post.key, postName: this.props.post.postName, authorName: this.props.post.authorName }
-    this.onChange = this.onChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
   }
 
-  onChange(event) {
+  onChange = (event) => {
     if(event.target.className === 'postName') {
       this.setState({ postName: event.target.value});
     } else {
@@ -56,7 +53,7 @@ class PostForm extends React.Component {
     }
   }
 
-  onSubmit(event) {
+  onSubmit = (event) => {
     this.props.onSubmit(event, this.state);
   }
 
@@ -83,11 +80,9 @@ class InitialLayout extends React.Component {
   constructor(props) {
     super(props);
     this.state = { newForm: false, postArray: postList }
-    this.handleClick = this.handleClick.bind(this);
-    this.onDelete = this.onDelete.bind(this);
   }
 
-  handleClick(event) {
+  handleClick = (event) => {
     this.setState({ newForm: !this.state.newForm })
   }
 
@@ -112,7 +107,7 @@ class InitialLayout extends React.Component {
     }
   }
 
-  onDelete(event, postKey) {
+  onDelete = (event, postKey) => {
     let keyValueIndex = this.findKeyIndex(postKey)
     let posts = Object.assign([], this.state.postArray);
     posts.splice(keyValueIndex, 1);
