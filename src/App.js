@@ -34,13 +34,24 @@ class PostDisplayList extends React.Component {
     this.state = { sortByPost: false, sortByAuthor: false }
   }
 
+  compareValues(key) {
+    return function(a, b) {
+      if (a[key] < b[key])
+        return -1;
+      if (a[key] > b[key])
+        return 1;
+      return 0;
+    };
+  }
+
   onCheckboxChange = (event) => {
     if(event.target.className === "postNameCheckbox") {
       this.setState({ sortByPost: true, sortByAuthor: false });
+      this.props.postList.sort(this.compareValues('postName'));
     } else {
       this.setState({ sortByAuthor: true, sortByPost: false });
+      this.props.postList.sort(this.compareValues('authorName'));
     }
-    this.props.onCheckboxChange(event);
   }
 
   render() {
@@ -105,38 +116,11 @@ class PostForm extends React.Component {
 class InitialLayout extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { newForm: false, postArray: postList, sortByAuthor: false, sortByPost: false }
-    this.onCheckboxChange = this.onCheckboxChange.bind(this);
+    this.state = { newForm: false, postArray: postList }
   }
 
   handleClick = (event) => {
     this.setState({ newForm: !this.state.newForm })
-  }
-
-  comparePostName(a,b) {
-    if (a.postName < b.postName)
-      return -1;
-    if (a.postName > b.postName)
-      return 1;
-    return 0;
-  }
-
-  compareAuthorName(a,b) {
-    if (a.authorName < b.authorName)
-      return -1;
-    if (a.authorName > b.authorName)
-      return 1;
-    return 0;
-  }
-
-  onCheckboxChange = (event) => {
-    let posts = this.state.postArray;
-    if(event.target.className === "postNameCheckbox") {
-      posts.sort(this.comparePostName);
-    } else {
-      posts.sort(this.compareAuthorName);
-    }
-    this.setState({ postArray: posts });
   }
 
   onSubmit(event, post) {
@@ -182,7 +166,7 @@ class InitialLayout extends React.Component {
       <div>
         {form}
         {button}
-        <PostDisplayList postList={this.state.postArray} onDelete={this.onDelete} onSubmit={(event, arg) => this.onSubmit(arg, event)}  onCheckboxChange={this.onCheckboxChange}/>
+        <PostDisplayList postList={this.state.postArray} onDelete={this.onDelete} onSubmit={(event, arg) => this.onSubmit(arg, event)} />
       </div>
     );
   }
