@@ -31,7 +31,7 @@ class List extends React.Component {
 class PostDisplayList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { sortByPost: false, sortByAuthor: false }
+    this.state = { sortByPost: false, sortByAuthor: false, searchText: '', view: 'list' }
   }
 
   compareValues(key) {
@@ -54,9 +54,27 @@ class PostDisplayList extends React.Component {
     }
   }
 
+  onSearchSubmit = (event) => {
+    event.preventDefault();
+    let filterKey = this.state.sortByAuthor ? 'authorName' : 'postName'
+    this.props.filterPostList(this.state.searchText, filterKey);
+  }
+
+  viewChange = (event) => {
+    if(event.target.className === 'listView') {
+      this.setState({ view: 'list' })
+    } else {
+      this.setState({ view: 'grid' })
+    }
+  }
+
+  onTextChange = (event) => {
+    this.setState({ searchText: event.target.value });
+  }
+
   render() {
     const lists = this.props.postList.map((post, index) =>
-      <List post={post} onDelete={this.props.onDelete} onSubmit={(post, event) => this.props.onSubmit(post, event)} />
+      <List post={post} onDelete={this.props.onDelete} onSubmit={(post, event) => this.props.onSubmit(post, event)} view={this.state.view} />
     );
     return (
       <div>
@@ -69,6 +87,16 @@ class PostDisplayList extends React.Component {
           Author Name
           <input type="checkbox" className="authorNameCheckbox" onChange={this.onCheckboxChange} checked={this.state.sortByAuthor}/>
         </label>
+        <form onSubmit={this.onSearchSubmit}>
+          <label>
+            Search
+            <input type="checkebox" className="searchBox" onChange={this.onTextChange} value={this.state.search} />
+            <input type="submit" value="Submit" />
+          </label>
+        </form>
+        <button onClick={this.props.handleResetClick}> Reset Search</button>
+        <button onClick={this.changeView} className="listView"> List View</button>
+        <button onClick={this.changeView} className="gridView"> Grid View</button>
         <ul>{lists}</ul>
       </div>
 
@@ -116,7 +144,7 @@ class PostForm extends React.Component {
 class InitialLayout extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { newForm: false, postArray: postList }
+    this.state = { newForm: false, postArray: postList, filteredList: postList }
   }
 
   handleClick = (event) => {
@@ -130,7 +158,7 @@ class InitialLayout extends React.Component {
       posts[postIndex].postName = post.postName;
       posts[postIndex].authorName = post.authorName;
     } else {
-      posts.push({key: this.state.postArray.length, postName: post.postName, authorName: post.authorName});
+      posts.push({key: this.state.postArray.length, postName: post.postName, authorName: post.authorName });
     }
     this.setState({ postArray: posts});
     event.preventDefault();
@@ -144,11 +172,30 @@ class InitialLayout extends React.Component {
     }
   }
 
+  filterPostList = (filterText, filterKey) => {
+    if(filterText === '') {
+      this.setState({ filteredList: this.state.postArray });
+      return 0;
+    }
+    let filteredList = [];
+    let list = this.state.postArray;
+    for(let i = 0; i < list.length; i++) {
+      if(list[i][filterKey].toUpperCase().indexOf(filterText.toUpperCase()) > -1) {
+        filteredList.push(list[i]);
+      }
+    }
+    this.setState({ filteredList: filteredList });
+  }
+
+  handleResetClick = () => {
+    this.setState({ filteredList: this.state.postArray });
+  }
+
   onDelete = (event, postKey) => {
     let keyValueIndex = this.findKeyIndex(postKey)
     let posts = Object.assign([], this.state.postArray);
     posts.splice(keyValueIndex, 1);
-    this.setState({postArray: posts});
+    this.setState({ postArray: posts });
   }
 
   render() {
@@ -166,7 +213,7 @@ class InitialLayout extends React.Component {
       <div>
         {form}
         {button}
-        <PostDisplayList postList={this.state.postArray} onDelete={this.onDelete} onSubmit={(event, arg) => this.onSubmit(arg, event)} />
+        <PostDisplayList postList={this.state.filteredList} onDelete={this.onDelete} onSubmit={(event, arg) => this.onSubmit(arg, event)} filterPostList={this.filterPostList} handleResetClick={this.handleResetClick}/>
       </div>
     );
   }
