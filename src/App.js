@@ -60,7 +60,7 @@ class PostDisplayList extends React.Component {
     this.props.filterPostList(this.state.searchText, filterKey);
   }
 
-  viewChange = (event) => {
+  changeView = (event) => {
     if(event.target.className === 'listView') {
       this.setState({ view: 'list' })
     } else {
@@ -72,10 +72,31 @@ class PostDisplayList extends React.Component {
     this.setState({ searchText: event.target.value });
   }
 
+  filterList = () => {
+    let filterKey = this.state.sortByAuthor ? 'authorName' : 'postName'
+    let filteredList = [];
+    let list = this.props.postList;
+    if(this.state.searchText === '') {
+      return this.props.postList;
+    }
+    for(let i = 0; i < list.length; i++) {
+      if(list[i][filterKey].toUpperCase().indexOf(this.state.searchText.toUpperCase()) > -1) {
+        filteredList.push(list[i]);
+      }
+    }
+    return filteredList;
+  }
+
+
+  handleResetClick = () => {
+    this.setState({ searchText: '' });
+  }
+
   render() {
-    const lists = this.props.postList.map((post, index) =>
-      <List post={post} onDelete={this.props.onDelete} onSubmit={(post, event) => this.props.onSubmit(post, event)} view={this.state.view} />
+    const lists = this.filterList().map((post, index) =>
+      <List post={post} onDelete={this.props.onDelete} onSubmit={(post, event) => this.props.onSubmit(post, event)} view={this.state.view} key={post.key} />
     );
+    const view = this.state.view === 'list' ? <ul className="list">{lists}</ul> : <div className='grid'>{lists}</div>
     return (
       <div>
         <h3>Sort By</h3>
@@ -87,17 +108,14 @@ class PostDisplayList extends React.Component {
           Author Name
           <input type="checkbox" className="authorNameCheckbox" onChange={this.onCheckboxChange} checked={this.state.sortByAuthor}/>
         </label>
-        <form onSubmit={this.onSearchSubmit}>
           <label>
             Search
-            <input type="checkebox" className="searchBox" onChange={this.onTextChange} value={this.state.search} />
-            <input type="submit" value="Submit" />
+            <input type="checkebox" className="searchBox" onChange={this.onTextChange} value={this.state.searchText} />
           </label>
-        </form>
-        <button onClick={this.props.handleResetClick}> Reset Search</button>
+        <button onClick={this.handleResetClick}> Reset Search</button>
         <button onClick={this.changeView} className="listView"> List View</button>
         <button onClick={this.changeView} className="gridView"> Grid View</button>
-        <ul>{lists}</ul>
+        {view}
       </div>
 
     );
@@ -170,25 +188,6 @@ class InitialLayout extends React.Component {
         return i;
       }
     }
-  }
-
-  filterPostList = (filterText, filterKey) => {
-    if(filterText === '') {
-      this.setState({ filteredList: this.state.postArray });
-      return 0;
-    }
-    let filteredList = [];
-    let list = this.state.postArray;
-    for(let i = 0; i < list.length; i++) {
-      if(list[i][filterKey].toUpperCase().indexOf(filterText.toUpperCase()) > -1) {
-        filteredList.push(list[i]);
-      }
-    }
-    this.setState({ filteredList: filteredList });
-  }
-
-  handleResetClick = () => {
-    this.setState({ filteredList: this.state.postArray });
   }
 
   onDelete = (event, postKey) => {
