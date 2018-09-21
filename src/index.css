@@ -12,3 +12,32 @@ div.grid {
 ul.list {
   background-color: green;
 }
+
+.split {
+  height: 100%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+/* Control the left side */
+.left {
+  left: 0;
+}
+
+/* Control the right side */
+.cart {
+  right: 0;
+  background-color: yellow;
+}
+
+.cart-heading {
+  text-align: center;
+}
+
+.cart-price {
+  text-align: center;
+}
